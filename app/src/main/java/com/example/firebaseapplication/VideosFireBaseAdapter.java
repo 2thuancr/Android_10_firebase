@@ -88,7 +88,7 @@ public class VideosFireBaseAdapter extends FirebaseRecyclerAdapter<Video1Model, 
             videoProgressBar = itemView.findViewById(R.id.videoProgressBar);
             textVideoTitle = itemView.findViewById(R.id.textVideoTitle);
             textVideoDescription = itemView.findViewById(R.id.textVideoDescription);
-            imPerson = itemView.findViewById(R.id.imPerson);
+            imPerson = itemView.findViewById(R.id.imgUploaderAvatar);
             favorites = itemView.findViewById(R.id.favorites);
             imShare = itemView.findViewById(R.id.imShare);
             imMore = itemView.findViewById(R.id.imMore);

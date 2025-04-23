@@ -17,6 +17,7 @@
         android:src="@drawable/ic_back"
         android:background="@android:color/transparent"
         android:contentDescription="Back"
+        android:elevation="10dp"
         app:tint="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
