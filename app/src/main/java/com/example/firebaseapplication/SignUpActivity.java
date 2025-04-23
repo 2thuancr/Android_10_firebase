@@ -1,7 +1,8 @@
 package com.example.firebaseapplication;
 
 import android.os.Bundle;
-
+import android.content.Intent;
+import android.view.View;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -20,5 +21,10 @@ public class SignUpActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+    public void goToLogin(View view) {
+        Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish(); // Đóng SignUp để không bị quay lại bằng nút back
     }
 }

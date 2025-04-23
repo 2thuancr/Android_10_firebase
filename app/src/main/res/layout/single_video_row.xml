@@ -2,10 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black">
 
+    <!-- Video Player -->
     <VideoView
         android:id="@+id/videoView"
         android:layout_width="match_parent"
@@ -13,115 +15,176 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintVertical_bias="1.0"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Progress Bar -->
     <ProgressBar
         android:id="@+id/videoProgressBar"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:indeterminateTint="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Left Side - Video Info -->
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
+        android:id="@+id/leftInfoLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintVertical_bias="0.888">
+        app:layout_constraintWidth_percent="0.7">
 
-        <LinearLayout
-            android:layout_weight="1"
-            android:layout_width="0dp"
+        <!-- Uploader Avatar (Clickable) -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imgUploaderAvatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="12dp"
+            android:src="@drawable/default_avatar"
+            app:civ_border_width="1dp"
+            app:civ_border_color="@color/white"/>
+
+        <!-- Uploader Email -->
+        <TextView
+            android:id="@+id/txtUploaderEmail"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="vertical"
-            android:gravity="bottom"
-            android:layout_gravity="bottom">
+            android:text="user@example.com"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
 
-            <TextView
-                android:id="@+id/textVideoTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Video Shorts"
-                android:textColor="@color/white"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:paddingTop="5dp"
-                android:paddingEnd="5dp"
-                android:paddingStart="9dp"
-                android:shadowDx="0"
-                android:shadowDy="0"
-                android:shadowRadius="15"/>
+        <!-- Video Title -->
+        <TextView
+            android:id="@+id/textVideoTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Video Title"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end"/>
 
-            <TextView
-                android:id="@+id/textVideoDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Video Shorts"
-                android:textColor="#fff"
-                android:textSize="16sp"
-                android:paddingStart="5dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="5dp"
-                android:shadowDx="0"
-                android:shadowDy="0"
-                android:shadowRadius="15"/>
-        </LinearLayout>
+        <!-- Video Description -->
+        <TextView
+            android:id="@+id/textVideoDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Video description goes here"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:maxLines="3"
+            android:ellipsize="end"/>
+    </LinearLayout>
 
+    <!-- Right Side - Interaction Buttons -->
+    <LinearLayout
+        android:id="@+id/rightActionLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Like/Dislike Section -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="end"
-            android:layout_gravity="end">
+            android:gravity="center">
 
+            <!-- Like Button -->
             <ImageView
-                android:id="@+id/imPerson"
-                android:src="@drawable/ic_person_pin"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="18dp"
-                android:padding="2dp"/>
+                android:id="@+id/btnLike"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_thumb_up"
+                app:tint="@color/white"
+                android:contentDescription="Like button"/>
 
-            <ImageView
-                android:id="@+id/favorites"
-                android:src="@drawable/ic_favorite"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="18dp"
-                android:layout_marginTop="5dp"
-                android:padding="2dp"/>
+            <!-- Like Count -->
+            <TextView
+                android:id="@+id/txtLikeCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"/>
 
+            <!-- Dislike Button -->
             <ImageView
-                android:id="@+id/imShare"
-                android:src="@drawable/ic_share"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="18dp"
-                android:layout_marginTop="5dp"
-                android:padding="6dp"/>
+                android:id="@+id/btnDislike"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="12dp"
+                android:src="@drawable/ic_thumb_down"
+                app:tint="@color/white"
+                android:contentDescription="Dislike button"/>
 
-            <ImageView
-                android:id="@+id/imMore"
-                android:src="@drawable/ic_more"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="18dp"
-                android:layout_marginTop="5dp"
-                android:padding="2dp"/>
+            <!-- Dislike Count -->
+            <TextView
+                android:id="@+id/txtDislikeCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"/>
         </LinearLayout>
+
+        <!-- Favorite Button -->
+        <ImageView
+            android:id="@+id/favorites"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/ic_favorite"
+            app:tint="@color/white"
+            android:contentDescription="Favorite button"/>
+
+        <!-- Share Button -->
+        <ImageView
+            android:id="@+id/imShare"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:src="@drawable/ic_share"
+            app:tint="@color/white"
+            android:contentDescription="Share button"/>
+
+        <!-- More Options -->
+        <ImageView
+            android:id="@+id/imMore"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:src="@drawable/ic_more"
+            app:tint="@color/white"
+            android:contentDescription="More options"/>
     </LinearLayout>
+    <!-- Current User Avatar (Moved Outside) -->
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgCurrentUserAvatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/default_avatar"
+        app:civ_border_width="2dp"
+        app:civ_border_color="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
