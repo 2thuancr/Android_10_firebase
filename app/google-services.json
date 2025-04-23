@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "72371906316",
-    "project_id": "videoshort-1f2e3",
-    "storage_bucket": "videoshort-1f2e3.firebasestorage.app"
+    "project_number": "279124887362",
+    "project_id": "fir-final-cf7b1",
+    "storage_bucket": "fir-final-cf7b1.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:72371906316:android:1ecbf9728c7e13375ecb29",
+        "mobilesdk_app_id": "1:279124887362:android:3f67306142abd0211d6adb",
         "android_client_info": {
           "package_name": "com.example.firebaseapplication"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCEiFuiCu7qL16_tNucz7x_EKTqEv4gGp8"
+          "current_key": "AIzaSyDFdq3W6N0_MsnhyNPAZMiT7-m7-PPzYLw"
         }
       ],
       "services": {
