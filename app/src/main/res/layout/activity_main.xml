@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/imgCurrentUserAvatar"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:src="@drawable/default_avatar"
         android:contentDescription="Avatar"
         android:layout_margin="16dp"

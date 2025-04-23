@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
         imgCurrentUserAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("DEBUG_CLICK", "Avatar clicked!");
                 Intent intent = new Intent(MainActivity.this, ViewProfileActivity.class);
                 startActivity(intent);
             }
