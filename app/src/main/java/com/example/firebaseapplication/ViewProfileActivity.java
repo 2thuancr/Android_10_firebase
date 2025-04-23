@@ -33,6 +33,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ViewProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
     private StorageReference storageReference;
 
     private static final int PICK_IMAGE_REQUEST = 1; // Mã yêu cầu chọn ảnh
@@ -47,6 +48,12 @@ public class ViewProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_profile);
 
         mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            // Người dùng chưa đăng nhập
+            finish();
+            return;
+        }
         storageReference = FirebaseStorage.getInstance().getReference();
 
         // Khởi tạo các View (phần tử giao diện)
@@ -67,6 +74,15 @@ public class ViewProfileActivity extends AppCompatActivity {
 
         // Đặt sự kiện cho nút thay đổi ảnh đại diện
         btnChangeAvatar.setOnClickListener(v -> openImagePicker());
+
+        if (currentUser != null && currentUser.getPhotoUrl() != null) {
+            // Dùng Picasso để load avatar lên View (giả sử imgCurrentUserAvatar là ImageView hoặc CircleImageView)
+            Picasso.get()
+                    .load(currentUser.getPhotoUrl())
+                    .placeholder(R.drawable.default_avatar) // avatar mặc định nếu chưa có
+                    .error(R.drawable.default_avatar)       // avatar lỗi
+                    .into((ImageView) imgCurrentUserAvatar); // ép kiểu vì imgCurrentUserAvatar đang là View
+        }
     }
 
     // Mở trình chọn ảnh để người dùng chọn ảnh mới
@@ -90,7 +106,7 @@ public class ViewProfileActivity extends AppCompatActivity {
                         .into(imgCurrentUserAvatar); // Đặt ảnh vào CircleImageView
 
                 // Tạo tên file duy nhất
-                String fileName = "avatars/" + UUID.randomUUID().toString() + ".jpg";
+                String fileName = "avatars/" + currentUser.getUid() + ".jpg";
                 StorageReference avatarRef = storageReference.child(fileName);
 
                 try {
@@ -122,13 +138,12 @@ public class ViewProfileActivity extends AppCompatActivity {
     }
 
     private void updateUserProfile(String photoUrl) {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
+        if (currentUser != null) {
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                     .setPhotoUri(Uri.parse(photoUrl))  // Cập nhật ảnh đại diện mới
                     .build();
 
-            user.updateProfile(profileUpdates)
+            currentUser.updateProfile(profileUpdates)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(this, "Đã cập nhật avatar!", Toast.LENGTH_SHORT).show();
