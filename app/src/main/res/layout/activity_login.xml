@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:background="#CCFFFFFF">
 
     <LinearLayout
         android:id="@+id/loginForm"
-        android:layout_width="329dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:layout_margin="16dp"
         android:orientation="vertical"
         android:background="#CCFFFFFF"
-        android:elevation="8dp"
         android:clipToPadding="false"
-        android:padding="24dp">
+        android:padding="36dp">
 
         <!-- Title -->
         <TextView
@@ -27,6 +26,7 @@
             android:textStyle="bold"
             android:textColor="#333333"
             android:layout_gravity="center"
+            android:layout_marginTop="50dp"
             android:layout_marginBottom="20dp" />
 
         <!-- Avatar Image -->
@@ -48,8 +48,10 @@
             android:layout_height="wrap_content"
             android:hint="Username"
             android:inputType="text"
+            android:textColor="@color/purple_500"
             android:layout_marginBottom="16dp"
             android:padding="12dp"
+            android:layout_margin="12dp"
             android:background="@drawable/edittext_background"
             android:drawableLeft="@drawable/ic_username"
             android:drawablePadding="10dp" />
@@ -61,11 +63,22 @@
             android:layout_height="wrap_content"
             android:hint="Password"
             android:inputType="textPassword"
+            android:textColor="@color/purple_500"
             android:layout_marginBottom="16dp"
             android:padding="12dp"
+            android:layout_margin="12dp"
             android:background="@drawable/edittext_background"
             android:drawableLeft="@drawable/ic_username"
             android:drawablePadding="10dp" />
+
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:layout_margin="12dp"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFFFFF" />
 
         <!-- Signup link -->
         <TextView
