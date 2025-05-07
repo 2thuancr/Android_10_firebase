@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -38,7 +39,9 @@ import com.squareup.picasso.Picasso;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -59,6 +62,8 @@ public class ViewProfileActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     DatabaseReference videosRef;
     List<Video1Model> userVideos = new ArrayList<>();
+    private static final int PICK_VIDEO_REQUEST = 100;
+    private Button btnSelectVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +84,12 @@ public class ViewProfileActivity extends AppCompatActivity {
         imgCurrentUserAvatar = findViewById(R.id.imgCurrentUserAvatar);
         btnBack = findViewById(R.id.btnBack);
         btnChangeAvatar = findViewById(R.id.btnChangeAvatar);
+        btnSelectVideo = findViewById(R.id.btnSelectVideo);
         txtProfileEmail = findViewById(R.id.txtProfileEmail);
         txtVideoCount = findViewById(R.id.txtVideoCount);
         recyclerView = findViewById(R.id.recyclerUserVideos);
+
+
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 cột
 
         UserVideoAdapter adapter = new UserVideoAdapter(this, userVideos);
@@ -90,6 +98,11 @@ public class ViewProfileActivity extends AppCompatActivity {
         // Đặt sự kiện cho nút quay lại
         btnBack.setOnClickListener(v -> {
             finish(); // Quay lại màn hình trước
+        });
+        btnSelectVideo.setOnClickListener(v -> {
+            // Mở file picker cho phép chọn video
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(intent, PICK_VIDEO_REQUEST);
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(btnBack, (v, insets) -> {
@@ -199,6 +212,11 @@ public class ViewProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "Không tìm thấy ảnh", Toast.LENGTH_SHORT).show();
             }
         }
+
+        if (requestCode == PICK_VIDEO_REQUEST && resultCode == RESULT_OK && data != null) {
+            Uri videoUri = data.getData();
+            uploadVideoToFirebase(videoUri);
+        }
     }
 
 
@@ -217,6 +235,48 @@ public class ViewProfileActivity extends AppCompatActivity {
                         }
                     });
         }
+    }
+
+    private void uploadVideoToFirebase(Uri videoUri) {
+        if (videoUri != null) {
+            // Lấy đường dẫn đến Firebase Storage
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageReference = storage.getReference();
+            String videoFileName = "videos/" + UUID.randomUUID().toString() + ".mp4";
+            StorageReference videoRef = storageReference.child(videoFileName);
+
+            // Upload video
+            UploadTask uploadTask = videoRef.putFile(videoUri);
+            uploadTask.addOnSuccessListener(taskSnapshot -> {
+                // Lấy URL của video sau khi upload thành công
+                videoRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String videoUrl = uri.toString();
+                    // Cập nhật thông tin video lên Firestore (hoặc Realtime Database)
+                    updateVideoInfo(videoUrl);
+                });
+            }).addOnFailureListener(e -> {
+                Toast.makeText(ViewProfileActivity.this, "Upload video thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        }
+    }
+    private void updateVideoInfo(String videoUrl) {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Tạo document mới trong Firestore cho video của người dùng
+        Map<String, Object> videoData = new HashMap<>();
+        videoData.put("url", videoUrl);
+        videoData.put("userId", userId);
+        videoData.put("timestamp", FieldValue.serverTimestamp());
+
+        firestore.collection("videos")
+                .add(videoData)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(ViewProfileActivity.this, "Video đã đăng thành công!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(ViewProfileActivity.this, "Đăng video thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
 }
