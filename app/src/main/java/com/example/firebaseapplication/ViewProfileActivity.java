@@ -19,6 +19,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -92,50 +94,59 @@ public class ViewProfileActivity extends AppCompatActivity {
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    // Xử lý kết quả khi người dùng chọn ảnh
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri imageUri = data.getData();  // Lấy URI của ảnh đã chọn
-            if (imageUri != null) {
-                // Sử dụng Picasso để tải ảnh và set vào CircleImageView
-                Picasso.get()
-                        .load(imageUri)  // Tải ảnh từ URI
-                        .into(imgCurrentUserAvatar); // Đặt ảnh vào CircleImageView
 
-                // Tạo tên file duy nhất
-                String fileName = "avatars/" + currentUser.getUid() + ".jpg";
-                StorageReference avatarRef = storageReference.child(fileName);
+            // Hiển thị ảnh chọn trước
+            Picasso.get().load(imageUri).into(imgCurrentUserAvatar);
 
-                try {
-                    InputStream stream = getContentResolver().openInputStream(imageUri);
-                    UploadTask uploadTask = avatarRef.putStream(stream);
+            // Tạo tên file duy nhất
+            String fileName = "avatars/" + currentUser.getUid() + ".jpg";
+            StorageReference avatarRef = storageReference.child(fileName);
 
-                    uploadTask
-                            .addOnSuccessListener(taskSnapshot -> {
-                                // Lấy URL của ảnh sau khi tải lên
-                                avatarRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                                    String photoUrl = uri.toString();
-                                    // Cập nhật profile người dùng với URL ảnh vừa tải lên
-                                    updateUserProfile(photoUrl);
+            try {
+                InputStream stream = getContentResolver().openInputStream(imageUri);
+                UploadTask uploadTask = avatarRef.putStream(stream);
 
-                                    Toast.makeText(this, "Đã upload ảnh đại diện!", Toast.LENGTH_SHORT).show();
-                                });
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(this, "Upload thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                Log.e("UPLOAD", "Upload error", e);
+                uploadTask
+                        .addOnSuccessListener(taskSnapshot -> {
+                            // Lấy URL của ảnh sau khi tải lên
+                            avatarRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                String photoUrl = uri.toString();
+
+                                // ✅ Cập nhật vào Firestore
+                                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                DocumentReference userDocRef = firestore.collection("users").document(currentUser.getUid());
+
+                                userDocRef.update("avatarUrl", photoUrl)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(this, "Đã cập nhật ảnh đại diện!", Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(this, "Lưu Firestore thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            Log.e("FIRESTORE", "Error updating avatarUrl", e);
+                                        });
+
+                                // (Không bắt buộc) Cập nhật profile trong Firebase Auth nếu bạn dùng
+                                updateUserProfile(photoUrl);
                             });
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(this, "Upload thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.e("UPLOAD", "Upload error", e);
+                        });
 
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    Toast.makeText(this, "Không tìm thấy ảnh", Toast.LENGTH_SHORT).show();
-                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Không tìm thấy ảnh", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
 
     private void updateUserProfile(String photoUrl) {
         if (currentUser != null) {

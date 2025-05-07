@@ -13,6 +13,7 @@ import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 
@@ -35,6 +36,12 @@ public class VideosFireBaseAdapter extends FirebaseRecyclerAdapter<Video1Model, 
         holder.textVideoTitle.setText(model.getTitle());
         holder.textVideoDescription.setText(model.getDesc());
         holder.videoView.setVideoURI(Uri.parse(model.getUrl()));
+
+
+//        Glide.with(holder.imgUploaderAvatar.getContext())
+//                .load(avatarUrl)
+//                .placeholder(R.drawable.default_avatar) // ảnh mặc định nếu chưa có
+//                .into(holder.imgUploaderAvatar);
 
         holder.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -80,10 +87,11 @@ public class VideosFireBaseAdapter extends FirebaseRecyclerAdapter<Video1Model, 
         private ProgressBar videoProgressBar;
         private TextView textVideoTitle;
         private TextView textVideoDescription;
-        private ImageView imPerson, favorites, imShare, imMore;
+        private ImageView imPerson, favorites, imShare, imMore, imgUploaderAvatar;
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
+            imgUploaderAvatar = itemView.findViewById(R.id.imgUploaderAvatar);
             videoView = itemView.findViewById(R.id.videoView);
             videoProgressBar = itemView.findViewById(R.id.videoProgressBar);
             textVideoTitle = itemView.findViewById(R.id.textVideoTitle);

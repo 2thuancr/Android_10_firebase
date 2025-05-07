@@ -7,6 +7,25 @@ public class Video1Model implements Serializable {
     private String desc;
     private String url;
     private String title;
+
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public Video1Model(int id, String desc, String url, String title, String userId) {
+        this.id = id;
+        this.desc = desc;
+        this.url = url;
+        this.title = title;
+        this.userId = userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     // Constructor rỗng (bắt buộc)
     public Video1Model() {
     }
@@ -42,10 +61,4 @@ public class Video1Model implements Serializable {
         this.title = title;
     }
 
-    public Video1Model(int id, String desc, String url, String title) {
-        this.id = id;
-        this.desc = desc;
-        this.url = url;
-        this.title = title;
-    }
 }

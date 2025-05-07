@@ -23,8 +23,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -103,15 +106,41 @@ public class MainActivity extends AppCompatActivity {
         viewPager2.setAdapter(videosAdapter);
     }
 
+
+    private void loadUserInfo() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            FirebaseFirestore.getInstance().collection("users")
+                    .document(user.getUid())
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String avatarUrl = documentSnapshot.getString("avatarUrl");
+                            if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                                // Load ảnh avatar từ Firestore (dùng Picasso)
+                                Picasso.get()
+                                        .load(avatarUrl)
+                                        .networkPolicy(NetworkPolicy.NO_CACHE)
+                                        .memoryPolicy(MemoryPolicy.NO_CACHE)
+                                        .placeholder(R.drawable.default_avatar)
+                                        .error(R.drawable.default_avatar)
+                                        .into(imgCurrentUserAvatar); // imgCurrentUserAvatar là ImageView của bạn
+                            }
+                        }
+                    });
+        }
+    }
+
     private ArrayList<Video1Model> initVideos() {
         ArrayList<Video1Model> videos = new ArrayList<>();
 
         videos.add(
                 new Video1Model(
-                1,
-                "Video Description",
-                "https://videos.pexels.com/video-files/6752408/6752408-uhd_1440_2732_25fps.mp4",
-                "cottonbro studio"
+                        1,
+                        "Video Description",
+                        "https://videos.pexels.com/video-files/6752408/6752408-uhd_1440_2732_25fps.mp4",
+                        "cottonbro studio",
+                        "8FL1egvnNdfmCt0Zm8QD7YVS4fw1"
         ));
 
         videos.add(
@@ -119,7 +148,8 @@ public class MainActivity extends AppCompatActivity {
                         2,
                         "Video Description",
                         "https://videos.pexels.com/video-files/8371249/8371249-uhd_1440_2732_25fps.mp4",
-                        "Ron Lach"
+                        "Ron Lach",
+                        "vq5cnKxV72gCSj6FPArDRnqK0Fp1"
                 ));
 
         videos.add(
@@ -127,7 +157,8 @@ public class MainActivity extends AppCompatActivity {
                         3,
                         "Video Description",
                         "https://videos.pexels.com/video-files/5082036/5082036-uhd_1440_2732_25fps.mp4",
-                        "Two people are holding up their phones to take a picture"
+                        "Two people are holding up their phones to take a picture",
+                        "vq5cnKxV72gCSj6FPArDRnqK0Fp1"
                 ));
 
         videos.add(
@@ -135,7 +166,8 @@ public class MainActivity extends AppCompatActivity {
                         4,
                         "Video Description",
                         "https://videos.pexels.com/video-files/7744213/7744213-uhd_1440_2732_25fps.mp4",
-                        "MART PRODUCTION"
+                        "MART PRODUCTION",
+                        "vq5cnKxV72gCSj6FPArDRnqK0Fp1"
                 ));
 
         return videos;
@@ -187,5 +219,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         videosAdapter.notifyDataSetChanged();
+        loadUserInfo(); // Gọi lại hàm tải thông tin người dùng mỗi khi quay lại màn hình
     }
 }
