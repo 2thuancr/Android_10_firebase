@@ -8,9 +8,11 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,6 +21,11 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -42,6 +49,9 @@ public class ViewProfileActivity extends AppCompatActivity {
     private CircleImageView imgCurrentUserAvatar;  // Đối tượng CircleImageView hiển thị ảnh đại diện
     ImageButton btnBack;
     Button btnChangeAvatar;
+    TextView txtProfileEmail;
+
+    TextView txtVideoCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +72,8 @@ public class ViewProfileActivity extends AppCompatActivity {
         imgCurrentUserAvatar = findViewById(R.id.imgCurrentUserAvatar);
         btnBack = findViewById(R.id.btnBack);
         btnChangeAvatar = findViewById(R.id.btnChangeAvatar);
+        txtProfileEmail = findViewById(R.id.txtProfileEmail);
+        txtVideoCount = findViewById(R.id.txtVideoCount);
 
         // Đặt sự kiện cho nút quay lại
         btnBack.setOnClickListener(v -> {
@@ -84,7 +96,28 @@ public class ViewProfileActivity extends AppCompatActivity {
                     .placeholder(R.drawable.default_avatar) // avatar mặc định nếu chưa có
                     .error(R.drawable.default_avatar)       // avatar lỗi
                     .into((ImageView) imgCurrentUserAvatar); // ép kiểu vì imgCurrentUserAvatar đang là View
+
+            txtProfileEmail.setText(currentUser.getEmail());
+
+            DatabaseReference videosRef = FirebaseDatabase.getInstance().getReference("videos");
+
+            videosRef.orderByChild("userId").equalTo(currentUser.getUid())
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            long videoCount = snapshot.getChildrenCount();
+                            txtVideoCount.setText("Số video đã đăng: " + videoCount);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            txtVideoCount.setText("Không thể tải dữ liệu");
+                            Log.e("ProfileDetail", "Lỗi khi lấy video: " + error.getMessage());
+                        }
+                    });
         }
+
+
     }
 
     // Mở trình chọn ảnh để người dùng chọn ảnh mới
