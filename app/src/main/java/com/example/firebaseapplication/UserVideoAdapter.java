@@ -1,6 +1,7 @@
 package com.example.firebaseapplication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +36,15 @@ public class UserVideoAdapter extends RecyclerView.Adapter<UserVideoAdapter.Vide
         // Load ảnh thumbnail (nếu có), ở đây tạm dùng video URL
         Glide.with(context)
                 .load(video.getUrl())
-                .placeholder(R.drawable.ic_username)
+                .placeholder(R.drawable.ic_placeholder)
                 .into(holder.thumbnail);
+
+        holder.thumbnail.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.thumbnail.getContext(), FullscreenVideoActivity.class);
+            intent.putExtra("videoUrl", video.getUrl());
+            holder.thumbnail.getContext().startActivity(intent);
+        });
+
     }
 
     @Override
