@@ -15,6 +15,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -36,7 +37,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
     private ViewPager2 viewPager2;
-    private VideosFireBaseAdapter videosAdapter;
+    private VideosFireStoreAdapter videosAdapter;
     private CircleImageView imgCurrentUserAvatar;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -96,15 +97,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getVideos() {
-        /*#set databases*/
-        DatabaseReference mDataBase = FirebaseDatabase.getInstance().getReference("videos");
-        FirebaseRecyclerOptions<Video1Model> options = new FirebaseRecyclerOptions.Builder<Video1Model>()
-                .setQuery(mDataBase, Video1Model.class).build();
-        /*#set adapter*/
-        videosAdapter = new VideosFireBaseAdapter(options);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Query query = db.collection("videos").orderBy("timestamp", Query.Direction.DESCENDING);
+
+        FirestoreRecyclerOptions<Video1Model> options = new FirestoreRecyclerOptions.Builder<Video1Model>()
+                .setQuery(query, Video1Model.class)
+                .build();
+
+        videosAdapter = new VideosFireStoreAdapter(options); // Adapter mới dùng Firestore
         viewPager2.setOrientation(ViewPager2.ORIENTATION_VERTICAL);
         viewPager2.setAdapter(videosAdapter);
+        videosAdapter.startListening();
     }
+
 
 
     private void loadUserInfo() {
