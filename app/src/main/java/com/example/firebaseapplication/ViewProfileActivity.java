@@ -261,13 +261,18 @@ public class ViewProfileActivity extends AppCompatActivity {
     }
     private void updateVideoInfo(String videoUrl) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+
 
         // Tạo document mới trong Firestore cho video của người dùng
         Map<String, Object> videoData = new HashMap<>();
         videoData.put("url", videoUrl);
-        videoData.put("userId", userId);
+        videoData.put("userId", currentUser.getUid());
         videoData.put("timestamp", FieldValue.serverTimestamp());
+        videoData.put("title", "Video mới của" + currentUser.getDisplayName());
+        videoData.put("desc", "Mô tả video mới - " + currentUser.getEmail());
+        videoData.put("id", 0);
 
         firestore.collection("videos")
                 .add(videoData)

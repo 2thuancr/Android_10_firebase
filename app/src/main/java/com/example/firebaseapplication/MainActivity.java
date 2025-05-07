@@ -15,13 +15,15 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -36,7 +38,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
     private ViewPager2 viewPager2;
-    private VideosFireBaseAdapter videosAdapter;
+    private VideosFireStoreAdapter videosAdapter;
     private CircleImageView imgCurrentUserAvatar;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -96,15 +98,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getVideos() {
-        /*#set databases*/
-        DatabaseReference mDataBase = FirebaseDatabase.getInstance().getReference("videos");
-        FirebaseRecyclerOptions<Video1Model> options = new FirebaseRecyclerOptions.Builder<Video1Model>()
-                .setQuery(mDataBase, Video1Model.class).build();
-        /*#set adapter*/
-        videosAdapter = new VideosFireBaseAdapter(options);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Query query = db.collection("videos").orderBy("timestamp", Query.Direction.DESCENDING);
+
+        FirestoreRecyclerOptions<Video1Model> options = new FirestoreRecyclerOptions.Builder<Video1Model>()
+                .setQuery(query, Video1Model.class)
+                .build();
+
+        videosAdapter = new VideosFireStoreAdapter(options); // Adapter mới dùng Firestore
         viewPager2.setOrientation(ViewPager2.ORIENTATION_VERTICAL);
         viewPager2.setAdapter(videosAdapter);
+        videosAdapter.startListening();
     }
+
 
 
     private void loadUserInfo() {
@@ -174,8 +180,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void uploadVideoData(Video1Model video) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference videosRef = db.collection("videos");
+
+        // Kiểm tra sự tồn tại của video bằng URL
+        videosRef.whereEqualTo("url", video.getUrl())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        if (!task.getResult().isEmpty()) {
+                            Log.d("Firestore", "Video already exists!");
+                        } else {
+                            // Video chưa tồn tại, thêm vào Firestore
+                            videosRef.add(video)
+                                    .addOnSuccessListener(documentReference ->
+                                            Log.d("Firestore", "Video added successfully!"))
+                                    .addOnFailureListener(e ->
+                                            Log.e("Firestore", "Failed to add video", e));
+                        }
+                    } else {
+                        Log.e("Firestore", "Failed to check video existence", task.getException());
+                    }
+                });
+    }
+
+    private void uploadVideoRealtimeDatabase(Video1Model video) {
         // Kiểm tra sự tồn tại của video trước khi thêm
-        Query query = videosRef.orderByChild("url").equalTo(video.getUrl());
+        com.google.firebase.database.Query query = videosRef.orderByChild("url").equalTo(video.getUrl());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
