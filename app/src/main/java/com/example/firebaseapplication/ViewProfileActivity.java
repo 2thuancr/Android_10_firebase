@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,6 +37,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -52,6 +56,9 @@ public class ViewProfileActivity extends AppCompatActivity {
     TextView txtProfileEmail;
 
     TextView txtVideoCount;
+    RecyclerView recyclerView;
+    DatabaseReference videosRef;
+    List<Video1Model> userVideos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +81,11 @@ public class ViewProfileActivity extends AppCompatActivity {
         btnChangeAvatar = findViewById(R.id.btnChangeAvatar);
         txtProfileEmail = findViewById(R.id.txtProfileEmail);
         txtVideoCount = findViewById(R.id.txtVideoCount);
+        recyclerView = findViewById(R.id.recyclerUserVideos);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 cột
+
+        UserVideoAdapter adapter = new UserVideoAdapter(this, userVideos);
+        recyclerView.setAdapter(adapter);
 
         // Đặt sự kiện cho nút quay lại
         btnBack.setOnClickListener(v -> {
@@ -99,7 +111,7 @@ public class ViewProfileActivity extends AppCompatActivity {
 
             txtProfileEmail.setText(currentUser.getEmail());
 
-            DatabaseReference videosRef = FirebaseDatabase.getInstance().getReference("videos");
+            videosRef = FirebaseDatabase.getInstance().getReference("videos");
 
             videosRef.orderByChild("userId").equalTo(currentUser.getUid())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -107,6 +119,15 @@ public class ViewProfileActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             long videoCount = snapshot.getChildrenCount();
                             txtVideoCount.setText("Số video đã đăng: " + videoCount);
+
+                            userVideos.clear();
+                            for (DataSnapshot videoSnap : snapshot.getChildren()) {
+                                Video1Model video = videoSnap.getValue(Video1Model.class);
+                                if (video != null) {
+                                    userVideos.add(video);
+                                }
+                            }
+                            adapter.notifyDataSetChanged();
                         }
 
                         @Override

@@ -1,0 +1,15 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Nền màu xám nhạt -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#CCCCCC" />
+        </shape>
+    </item>
+
+    <!-- Icon play ở giữa -->
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/ic_favorite" />
+    </item>
+</layer-list>
