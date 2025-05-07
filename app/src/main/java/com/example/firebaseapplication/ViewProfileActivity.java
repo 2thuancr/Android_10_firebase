@@ -5,9 +5,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,6 +66,8 @@ public class ViewProfileActivity extends AppCompatActivity {
     TextView txtVideoCount;
     RecyclerView recyclerView;
     UserVideoAdapter adapter;
+    private ProgressBar progressBarUpload;
+
     List<Video1Model> userVideos = new ArrayList<>();
     private static final int PICK_VIDEO_REQUEST = 100;
     private Button btnSelectVideo;
@@ -97,6 +101,7 @@ public class ViewProfileActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 cột
         adapter = new UserVideoAdapter(this, userVideos);
         recyclerView.setAdapter(adapter);
+        progressBarUpload = findViewById(R.id.progressBarUpload);
 
         // Đặt sự kiện cho nút quay lại
         btnBack.setOnClickListener(v -> {
@@ -242,6 +247,8 @@ public class ViewProfileActivity extends AppCompatActivity {
 
     private void uploadVideoToFirebase(Uri videoUri) {
         if (videoUri != null) {
+            progressBarUpload.setVisibility(View.VISIBLE); // Hiện loading
+
             // Lấy đường dẫn đến Firebase Storage
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageReference = storage.getReference();
@@ -256,13 +263,19 @@ public class ViewProfileActivity extends AppCompatActivity {
                     String videoUrl = uri.toString();
                     // Cập nhật thông tin video lên Firestore (hoặc Realtime Database)
                     updateVideoInfo(videoUrl);
-                });
+                    progressBarUpload.setVisibility(View.GONE); // Ẩn loading
+                })
+                        .addOnFailureListener(e -> {
+                            progressBarUpload.setVisibility(View.GONE);
+                            Toast.makeText(this, "Lỗi khi lưu metadata", Toast.LENGTH_SHORT).show();
+                        });
             }).addOnFailureListener(e -> {
                 Toast.makeText(ViewProfileActivity.this, "Upload video thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                progressBarUpload.setVisibility(View.GONE); // Ẩn loading
             });
         }
     }
-    
+
     private void updateVideoInfo(String videoUrl) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -281,6 +294,7 @@ public class ViewProfileActivity extends AppCompatActivity {
                 .add(videoData)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(ViewProfileActivity.this, "Video đã đăng thành công!", Toast.LENGTH_SHORT).show();
+                    LoadData(); // ⚠️ Refresh danh sách sau khi upload
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(ViewProfileActivity.this, "Đăng video thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
