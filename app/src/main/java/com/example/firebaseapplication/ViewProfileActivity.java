@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -51,16 +52,18 @@ public class ViewProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private StorageReference storageReference;
+    private FirebaseFirestore firestore;
+    // private DatabaseReference videosRef;
+    private CollectionReference videosRef;
 
     private static final int PICK_IMAGE_REQUEST = 1; // Mã yêu cầu chọn ảnh
     private CircleImageView imgCurrentUserAvatar;  // Đối tượng CircleImageView hiển thị ảnh đại diện
     ImageButton btnBack;
     Button btnChangeAvatar;
     TextView txtProfileEmail;
-
     TextView txtVideoCount;
     RecyclerView recyclerView;
-    DatabaseReference videosRef;
+    UserVideoAdapter adapter;
     List<Video1Model> userVideos = new ArrayList<>();
     private static final int PICK_VIDEO_REQUEST = 100;
     private Button btnSelectVideo;
@@ -79,6 +82,9 @@ public class ViewProfileActivity extends AppCompatActivity {
             return;
         }
         storageReference = FirebaseStorage.getInstance().getReference();
+        firestore = FirebaseFirestore.getInstance();
+        videosRef = firestore.collection("videos");
+        // videosRef = FirebaseDatabase.getInstance().getReference("videos");
 
         // Khởi tạo các View (phần tử giao diện)
         imgCurrentUserAvatar = findViewById(R.id.imgCurrentUserAvatar);
@@ -88,11 +94,8 @@ public class ViewProfileActivity extends AppCompatActivity {
         txtProfileEmail = findViewById(R.id.txtProfileEmail);
         txtVideoCount = findViewById(R.id.txtVideoCount);
         recyclerView = findViewById(R.id.recyclerUserVideos);
-
-
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 cột
-
-        UserVideoAdapter adapter = new UserVideoAdapter(this, userVideos);
+        adapter = new UserVideoAdapter(this, userVideos);
         recyclerView.setAdapter(adapter);
 
         // Đặt sự kiện cho nút quay lại
@@ -114,44 +117,45 @@ public class ViewProfileActivity extends AppCompatActivity {
         // Đặt sự kiện cho nút thay đổi ảnh đại diện
         btnChangeAvatar.setOnClickListener(v -> openImagePicker());
 
-        if (currentUser != null && currentUser.getPhotoUrl() != null) {
-            // Dùng Picasso để load avatar lên View (giả sử imgCurrentUserAvatar là ImageView hoặc CircleImageView)
-            Picasso.get()
-                    .load(currentUser.getPhotoUrl())
-                    .placeholder(R.drawable.default_avatar) // avatar mặc định nếu chưa có
-                    .error(R.drawable.default_avatar)       // avatar lỗi
-                    .into((ImageView) imgCurrentUserAvatar); // ép kiểu vì imgCurrentUserAvatar đang là View
+       LoadData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LoadData();
+    }
+
+    private void LoadData() {
+        if (currentUser != null) {
+
+            if (currentUser.getPhotoUrl() != null) {
+                // Dùng Picasso để load avatar lên View (giả sử imgCurrentUserAvatar là ImageView hoặc CircleImageView)
+                Picasso.get()
+                        .load(currentUser.getPhotoUrl())
+                        .placeholder(R.drawable.default_avatar) // avatar mặc định nếu chưa có
+                        .error(R.drawable.default_avatar)       // avatar lỗi
+                        .into((ImageView) imgCurrentUserAvatar); // ép kiểu vì imgCurrentUserAvatar đang là View
+            }
 
             txtProfileEmail.setText(currentUser.getEmail());
 
-            videosRef = FirebaseDatabase.getInstance().getReference("videos");
-
-            videosRef.orderByChild("userId").equalTo(currentUser.getUid())
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            long videoCount = snapshot.getChildrenCount();
-                            txtVideoCount.setText("Số video đã đăng: " + videoCount);
-
-                            userVideos.clear();
-                            for (DataSnapshot videoSnap : snapshot.getChildren()) {
-                                Video1Model video = videoSnap.getValue(Video1Model.class);
-                                if (video != null) {
-                                    userVideos.add(video);
-                                }
-                            }
-                            adapter.notifyDataSetChanged();
+            videosRef.whereEqualTo("userId", currentUser.getUid()) // lọc theo user hiện tại
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        userVideos.clear();
+                        for (var document : queryDocumentSnapshots.getDocuments()) {
+                            Video1Model video = document.toObject(Video1Model.class);
+                            userVideos.add(video);
                         }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            txtVideoCount.setText("Không thể tải dữ liệu");
-                            Log.e("ProfileDetail", "Lỗi khi lấy video: " + error.getMessage());
-                        }
+                        txtVideoCount.setText("Videos: " + userVideos.size());
+                        adapter.notifyDataSetChanged();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Firestore", "Error loading user videos", e);
+                        Toast.makeText(ViewProfileActivity.this, "Lỗi tải video", Toast.LENGTH_SHORT).show();
                     });
         }
-
-
     }
 
     // Mở trình chọn ảnh để người dùng chọn ảnh mới
@@ -219,7 +223,6 @@ public class ViewProfileActivity extends AppCompatActivity {
         }
     }
 
-
     private void updateUserProfile(String photoUrl) {
         if (currentUser != null) {
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
@@ -259,19 +262,19 @@ public class ViewProfileActivity extends AppCompatActivity {
             });
         }
     }
+    
     private void updateVideoInfo(String videoUrl) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
-
 
         // Tạo document mới trong Firestore cho video của người dùng
         Map<String, Object> videoData = new HashMap<>();
         videoData.put("url", videoUrl);
         videoData.put("userId", currentUser.getUid());
         videoData.put("timestamp", FieldValue.serverTimestamp());
-        videoData.put("title", "Video mới của" + currentUser.getDisplayName());
-        videoData.put("desc", "Mô tả video mới - " + currentUser.getEmail());
+        videoData.put("title", "Video mới của" + currentUser.getEmail());
+        videoData.put("desc", "Mô tả video mới - " + currentUser.getUid());
         videoData.put("id", 0);
 
         firestore.collection("videos")
