@@ -2,29 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:background="#FFFFFF"
     android:padding="24dp">
 
-    <!-- Container để bo góc và giữ layout đẹp hơn -->
+    <!-- Container bo góc và căn giữa -->
     <LinearLayout
         android:id="@+id/signupForm"
-        android:layout_width="329dp"
-        android:layout_height="497dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="40dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="200dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="173dp"
-        android:background="#FFFFFF"
-        android:clipToPadding="false"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:background="@drawable/rounded_background"
+        android:elevation="8dp"
+        android:padding="24dp"
+        android:clipToPadding="false">
 
         <!-- Title -->
         <TextView
@@ -33,9 +26,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="24dp"
-            android:text="Signup"
-            android:textColor="#333333"
+            android:text="SIGNUP"
+            android:textColor="#FF01579B"
             android:textSize="40sp"
+            android:fontFamily="@font/concertone_regular"
             android:textStyle="bold" />
 
         <!-- Email Input -->
@@ -45,10 +39,12 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:background="@drawable/edittext_background"
-            android:drawableLeft="@drawable/ic_username"
+            android:drawableLeft="@drawable/ic_usernamee"
             android:drawablePadding="10dp"
+            android:fontFamily="@font/concertone_regular"
             android:textColor="@color/purple_500"
             android:hint="Email"
+            android:textColorHint="@color/light_blue_600"
             android:inputType="textEmailAddress"
             android:padding="12dp" />
 
@@ -59,10 +55,12 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:background="@drawable/edittext_background"
-            android:drawableLeft="@drawable/ic_username"
+            android:drawableLeft="@drawable/ic_password"
             android:drawablePadding="10dp"
             android:textColor="@color/purple_500"
             android:hint="Password"
+            android:fontFamily="@font/concertone_regular"
+            android:textColorHint="@color/light_blue_600"
             android:inputType="textPassword"
             android:padding="12dp" />
 
@@ -72,22 +70,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_background"
-            android:drawableLeft="@drawable/ic_username"
+            android:drawableLeft="@drawable/ic_password"
             android:drawablePadding="10dp"
             android:textColor="@color/purple_500"
+            android:textColorHint="@color/light_blue_600"
             android:hint="Confirm Password"
+            android:fontFamily="@font/concertone_regular"
             android:inputType="textPassword"
             android:padding="12dp" />
 
-        <Button
+        <!-- Button -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/signupButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:backgroundTint="#2196F3"
-            android:onClick="registerUser"
             android:text="Sign Up"
-            android:textColor="#FFFFFF" />
+            android:fontFamily="@font/concertone_regular"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="@color/light_blue_600"
+            app:cornerRadius="20dp"
+            android:onClick="registerUser" />
 
         <!-- Back to Login -->
         <TextView
@@ -97,15 +100,14 @@
             android:layout_gravity="center"
             android:layout_marginTop="24dp"
             android:clickable="true"
-            android:drawableStart="@drawable/ic_back"
-            android:drawablePadding="8dp"
             android:focusable="true"
             android:onClick="goToLogin"
             android:text="Back to Login"
+            android:fontFamily="@font/concertone_regular"
             android:textColor="#2196F3"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_back"
+            android:drawablePadding="8dp" />
     </LinearLayout>
-
-    <!-- Back to Login -->
 
 </RelativeLayout>

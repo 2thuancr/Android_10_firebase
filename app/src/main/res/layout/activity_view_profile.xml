@@ -5,108 +5,110 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
     android:background="@color/black"
     tools:context=".ViewProfileActivity">
 
-    <ProgressBar
-        android:id="@+id/progressBarUpload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@color/black_overlay"
-        android:visibility="gone"
-        style="?android:attr/progressBarStyleLarge"
+    <!-- Toolbar ở trên cùng -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/black"
+        android:layout_marginTop="15dp"
+        app:title="Trang cá nhân"
+        app:titleTextColor="@color/white"
+        app:navigationIcon="@drawable/ic_back"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_centerInParent="true"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-
-    <!-- Nút quay lại -->
-    <ImageButton
-        android:id="@+id/btnBack"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/ic_back"
-        android:background="@android:color/transparent"
-        android:contentDescription="Back"
-        android:elevation="10dp"
-        app:tint="@color/white"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- Ảnh đại diện (Circle) -->
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/imgCurrentUserAvatar"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="32dp"
-        android:src="@drawable/default_avatar"
-        app:civ_border_width="2dp"
-        app:civ_border_color="@color/white"
-        app:layout_constraintTop_toBottomOf="@id/btnBack"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Nút cập nhật ảnh -->
-    <Button
-        android:id="@+id/btnChangeAvatar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Thay đổi ảnh đại diện"
-        android:textAllCaps="false"
-        app:layout_constraintTop_toBottomOf="@id/imgCurrentUserAvatar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-    <Button
-        android:id="@+id/btnSelectVideo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/btnChangeAvatar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="Đăng Video" />
-
-    <!-- Email hoặc tên người dùng -->
-    <TextView
-        android:id="@+id/txtProfileEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="user@gmail.com"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/btnSelectVideo"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp" />
-
-    <!-- Thống kê số video -->
-    <TextView
-        android:id="@+id/txtVideoCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Số video đã đăng: 0"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        app:layout_constraintTop_toBottomOf="@id/txtProfileEmail"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerUserVideos"
+    <!-- Nội dung cuộn -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="8dp"
-        android:clipToPadding="false"
-        android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@id/txtVideoCount"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp">
+
+            <!-- ProgressBar -->
+            <ProgressBar
+                android:id="@+id/progressBarUpload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/black_overlay"
+                android:visibility="gone"
+                style="?android:attr/progressBarStyleLarge"/>
+
+            <!-- Ảnh đại diện -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/imgCurrentUserAvatar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="12dp"
+                android:src="@drawable/default_avatar"
+                app:civ_border_width="2dp"
+                app:civ_border_color="@color/white"/>
+
+            <!-- Nút cập nhật ảnh -->
+            <Button
+                android:id="@+id/btnChangeAvatar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thay đổi ảnh đại diện"
+                android:fontFamily="@font/anton_regular"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/blue_400"
+                android:layout_marginTop="16dp"/>
+
+            <!-- Nút đăng video -->
+            <Button
+                android:id="@+id/btnSelectVideo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/anton_regular"
+                android:backgroundTint="@color/blue_400"
+                android:textColor="@color/white"
+                android:text="Đăng Video"/>
+
+            <!-- Email -->
+            <TextView
+                android:id="@+id/txtProfileEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="user@gmail.com"
+                android:fontFamily="@font/concertone_regular"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"/>
+
+            <!-- Số video -->
+            <TextView
+                android:id="@+id/txtVideoCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Số video đã đăng: 0"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:layout_marginTop="12dp"/>
+
+            <!-- RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerUserVideos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="vertical"/>
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

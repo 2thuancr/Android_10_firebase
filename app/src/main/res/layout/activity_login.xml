@@ -8,23 +8,25 @@
 
     <LinearLayout
         android:id="@+id/loginForm"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:orientation="vertical"
-        android:background="#CCFFFFFF"
+        android:background="@drawable/rounded_background"
         android:clipToPadding="false"
-        android:padding="36dp">
+        android:padding="24dp"
+        android:elevation="8dp">
 
         <!-- Title -->
         <TextView
             android:id="@+id/loginTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Login"
+            android:text="LOGIN"
+            android:fontFamily="@font/concertone_regular"
             android:textSize="40sp"
             android:textStyle="bold"
-            android:textColor="#333333"
+            android:textColor="#FF01579B"
             android:layout_gravity="center"
             android:layout_marginTop="50dp"
             android:layout_marginBottom="20dp" />
@@ -34,7 +36,7 @@
             android:id="@+id/profileImage"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:src="@drawable/default_avatar"
+            android:src="@drawable/ic_avatar"
             android:layout_gravity="center"
             android:layout_marginBottom="24dp"
             android:scaleType="centerCrop"
@@ -47,13 +49,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Username"
+            android:fontFamily="@font/concertone_regular"
             android:inputType="text"
+            android:textColorHint="@color/light_blue_600"
             android:textColor="@color/purple_500"
             android:layout_marginBottom="16dp"
             android:padding="12dp"
             android:layout_margin="12dp"
             android:background="@drawable/edittext_background"
-            android:drawableLeft="@drawable/ic_username"
+            android:drawableLeft="@drawable/ic_usernamee"
             android:drawablePadding="10dp" />
 
         <!-- Password -->
@@ -62,23 +66,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Password"
+            android:fontFamily="@font/concertone_regular"
             android:inputType="textPassword"
+            android:textColorHint="@color/light_blue_600"
             android:textColor="@color/purple_500"
             android:layout_marginBottom="16dp"
             android:padding="12dp"
             android:layout_margin="12dp"
             android:background="@drawable/edittext_background"
-            android:drawableLeft="@drawable/ic_username"
+            android:drawableLeft="@drawable/ic_password"
             android:drawablePadding="10dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/loginButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Login"
+            android:layout_height="55dp"
             android:layout_margin="12dp"
-            android:backgroundTint="#2196F3"
-            android:textColor="#FFFFFF" />
+            android:elevation="10dp"
+            android:text="Login"
+            android:fontFamily="@font/concertone_regular"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="@color/light_blue_600"
+            app:cornerRadius="20dp" />
 
         <!-- Signup link -->
         <TextView
@@ -86,6 +95,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Signup"
+            android:fontFamily="@font/concertone_regular"
             android:textColor="#2196F3"
             android:textSize="16sp"
             android:layout_gravity="center"
@@ -96,3 +106,4 @@
     </LinearLayout>
 
 </RelativeLayout>
+

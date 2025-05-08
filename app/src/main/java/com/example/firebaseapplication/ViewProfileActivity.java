@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -92,7 +93,7 @@ public class ViewProfileActivity extends AppCompatActivity {
 
         // Khởi tạo các View (phần tử giao diện)
         imgCurrentUserAvatar = findViewById(R.id.imgCurrentUserAvatar);
-        btnBack = findViewById(R.id.btnBack);
+        //btnBack = findViewById(R.id.ic_back);
         btnChangeAvatar = findViewById(R.id.btnChangeAvatar);
         btnSelectVideo = findViewById(R.id.btnSelectVideo);
         txtProfileEmail = findViewById(R.id.txtProfileEmail);
@@ -103,21 +104,25 @@ public class ViewProfileActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         progressBarUpload = findViewById(R.id.progressBarUpload);
 
-        // Đặt sự kiện cho nút quay lại
-        btnBack.setOnClickListener(v -> {
-            finish(); // Quay lại màn hình trước
-        });
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Hiện icon back
+        }
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+
         btnSelectVideo.setOnClickListener(v -> {
             // Mở file picker cho phép chọn video
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(intent, PICK_VIDEO_REQUEST);
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(btnBack, (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+//        ViewCompat.setOnApplyWindowInsetsListener(btnBack, (v, insets) -> {
+//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+//            return insets;
+//        });
 
         // Đặt sự kiện cho nút thay đổi ảnh đại diện
         btnChangeAvatar.setOnClickListener(v -> openImagePicker());
